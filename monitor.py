@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
 from gpiozero import CPUTemperature
-from psutils import cpu_percent
+from psutil import cpu_percent
 
 class Monitor:
     def __init__(self, *options):
         possible = {'temp', 'usage'}
-        self.options = {*options}.intersect(possible) or possible
+        self.options = {*options}.intersection(possible) or possible
         
         if 'temp'  in self.options: self.cpu_temp = CPUTemperature()
         if 'usage' in self.options: cpu_percent(None)
@@ -17,7 +17,7 @@ class Monitor:
 
     def cpu_usage(self):
         """ Return the CPU usage since the last call. """
-        return self.cpu_percent(None)
+        return cpu_percent(None)
 
     def _get_result(self, option):
         return {
@@ -27,4 +27,4 @@ class Monitor:
         
     def all(self):
         """ Sample all monitored values. """
-        return {option: _get_result(option) for option in self.options}
+        return {option: self._get_result(option) for option in self.options}
