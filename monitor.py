@@ -8,12 +8,12 @@ class Monitor:
         possible = {'temp', 'usage'}
         self.options = {*options}.intersection(possible) or possible
         
-        if 'temp'  in self.options: self.cpu_temp = CPUTemperature()
+        if 'temp'  in self.options: self._cpu_temp = CPUTemperature()
         if 'usage' in self.options: cpu_percent(None)
 
     def cpu_temp(self):
         """ Return the current CPU temperature. """
-        return self.cpu_temp.temperature
+        return self._cpu_temp.temperature
 
     def cpu_usage(self):
         """ Return the CPU usage since the last call. """
