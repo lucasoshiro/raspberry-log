@@ -7,10 +7,11 @@ class CurrentSensor:
     def __init__(self):
         from ina219 import INA219
         self.ina219 = INA219(0.1)
+        self.ina219.configure()
 
     def current(self):
         """ Return the current in mA."""
-        return ina219.current()
+        return self.ina219.current()
 
     def power(self):
         """ Return the power in mW"""
@@ -44,7 +45,8 @@ class Monitor:
     def _get_result(self, option):
         return {
             'temp':  self.cpu_temp,
-            'usage': self.cpu_usage
+            'usage': self.cpu_usage,
+            'power': self.power
         }[option]()
         
     def all(self):
