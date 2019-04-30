@@ -5,7 +5,7 @@ from time import sleep
 from monitor import Monitor
 
 def main():
-    monitor = Monitor(argv[1:])
+    monitor = Monitor(*argv[1:])
 
     while True:
         print(monitor.all())
