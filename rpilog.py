@@ -13,8 +13,8 @@ def parse_args(args):
     return tuple(options[arg] for arg in args)
 
 def main():
-    options = parse_args(argv[1:])
-    monitor = Monitor(options)
+    monitor = Monitor(parse_args(argv[1:]))
+    options = monitor.options
 
     print(*options, sep=',')
 
