@@ -18,7 +18,7 @@ class CurrentSensor:
         return self.current() * 5
 
 class Monitor:
-    def __init__(self, *options):
+    def __init__(self, options):
         possible = {'temp', 'usage', 'power'}
         self.options = {*options}.intersection(possible) or possible
         

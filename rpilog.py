@@ -14,7 +14,7 @@ def parse_args(args):
 
 def main():
     options = parse_args(argv[1:])
-    monitor = Monitor(*options)
+    monitor = Monitor(options)
 
     print(*options, sep=',')
 
