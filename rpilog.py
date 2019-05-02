@@ -10,21 +10,33 @@ def parse_args(args):
         '-c': 'usage',
         '-p': 'power'
     }
-    return tuple(options[arg] for arg in args)
+    options = (*filter(lambda arg: arg is not None, (options.get(arg) for arg in args)),)
+    logfilename = args[-1] if args and args[-1][0] != '-' else None
+    return options, logfilename
 
 def main():
-    monitor = Monitor(parse_args(argv[1:]))
+    options, logfilename = parse_args(argv[1:])
+    monitor = Monitor(options)
     options = monitor.options
 
-    print(*options, sep=',')
+    logfile = None
+
+    if logfilename:
+        logfile = open(logfilename, 'w')
+        output = lambda values: logfile.write(','.join(map(str, values)) + '\n')
+    else:
+        output = lambda values: print(*values, sep=',')
+
+    output(options)
 
     try:
         while True:
             sample = monitor.all()
-            print(*(sample[op] for op in options), sep=',')
+            output(sample[op] for op in options)
             sleep(0.2)
 
     except KeyboardInterrupt:
+        if logfile: logfile.close()
         exit(0)
-
+        
 if __name__ == '__main__': main()
