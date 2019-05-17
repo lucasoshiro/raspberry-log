@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from sys import argv
-from time import sleep
+from time import sleep, time
 from monitor import Monitor
 
 def parse_args(args):
@@ -27,12 +27,12 @@ def main():
     else:
         output = lambda values: print(*values, sep=',')
 
-    output(options)
+    output(('timestamp', *options))
 
     try:
         while True:
             sample = monitor.all()
-            output(sample[op] for op in options)
+            output((time(), *(sample[op] for op in options)))
             sleep(0.2)
 
     except KeyboardInterrupt:
