@@ -8,7 +8,8 @@ def parse_args(args):
     options = {
         '-t': 'temp',
         '-c': 'usage',
-        '-p': 'power'
+        '-p': 'power',
+        '-m': 'ram'
     }
     options = (*filter(lambda arg: arg is not None, (options.get(arg) for arg in args)),)
     logfilename = args[-1] if args and args[-1][0] != '-' else None
@@ -17,7 +18,7 @@ def parse_args(args):
 def main():
     options, logfilename = parse_args(argv[1:])
     monitor = Monitor(options)
-    options = monitor.options
+    options = sorted(monitor.options)
 
     logfile = None
 
