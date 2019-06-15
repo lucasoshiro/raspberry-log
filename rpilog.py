@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 from sys import argv
-from time import sleep, time
+from time import sleep
 from monitor import Monitor
 
 def parse_args(args):
@@ -18,7 +18,7 @@ def parse_args(args):
 def main():
     options, logfilename = parse_args(argv[1:])
     monitor = Monitor(options)
-    options = sorted(monitor.options)
+    options = ('timestamp', *sorted(monitor.options))
 
     logfile = None
 
@@ -28,12 +28,12 @@ def main():
     else:
         output = lambda values: print(*values, sep=',')
 
-    output(('timestamp', *options))
+    output(options)
 
     try:
         while True:
             sample = monitor.all()
-            output((time(), *(sample[op] for op in options)))
+            output(sample[op] for op in options)
             sleep(0.2)
 
     except KeyboardInterrupt:

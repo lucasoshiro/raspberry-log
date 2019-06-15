@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+from time import time
+
 class CurrentSensor:
     def __init__(self):
         from ina219 import INA219
@@ -78,4 +80,6 @@ class Monitor:
         
     def all(self):
         """ Sample all monitored values. """
-        return {option: self._get_result(option) for option in self.options}
+        sample = {option: self._get_result(option) for option in self.options}
+        sample['timestamp'] = time()
+        return sample
