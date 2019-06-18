@@ -44,8 +44,8 @@ class Monitor:
     def __init__(self, options):
         possible = {'temp', 'usage', 'power', 'ram'}
         self.options = {*options}.intersection(possible) or possible
-        
-        if 'temp'  in self.options: self.temp_sensor = CPUTemperature()
+
+        if 'temp'  in self.options: self.temp_sensor = TempSensor()
         if 'usage' in self.options: self.cpu_sensor = CPUSensor()
         if 'power' in self.options: self.current_sensor = CurrentSensor()
         if 'ram'   in self.options: self.ram_sensor = RAMSensor()
