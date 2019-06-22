@@ -9,7 +9,9 @@ def parse_args(args):
         '-t': 'temp',
         '-c': 'usage',
         '-p': 'power',
-        '-m': 'ram'
+        '-m': 'ram',
+        '-d': 'net_down',
+        '-u': 'net_up'
     }
     options = (*filter(lambda arg: arg is not None, (options.get(arg) for arg in args)),)
     logfilename = args[-1] if args and args[-1][0] != '-' else None
