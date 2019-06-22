@@ -9,11 +9,11 @@ class CurrentSensor:
         self.ina219.configure()
 
     def current(self):
-        """ Return the current in mA."""
+        """ Return the current in mA. """
         return self.ina219.current()
 
     def power(self):
-        """ Return the power in mW"""
+        """ Return the power in mW. """
         return self.current() * 5
 
 class CPUSensor:
@@ -22,6 +22,7 @@ class CPUSensor:
         self.cpu_percent = lambda *_: cpu_percent(*_)
 
     def usage(self):
+        """ Return the CPU usage, in percent. """
         return self.cpu_percent(None)
 
 class TempSensor:
@@ -30,6 +31,7 @@ class TempSensor:
         self._cpu_temp = CPUTemperature()
 
     def temperature(self):
+        """ Return the CPU temperature, in degrees celsius. """
         return self._cpu_temp.temperature
 
 class RAMSensor:
@@ -38,6 +40,7 @@ class RAMSensor:
         self.virtual_memory = virtual_memory
 
     def used(self):
+        """ Return the used virtual memory, in bytes. """
         return self.virtual_memory().used
 
 class Monitor:
@@ -51,7 +54,7 @@ class Monitor:
         if 'ram'   in self.options: self.ram_sensor = RAMSensor()
 
     def cpu_temp(self):
-        """ Return the current CPU temperature. """
+        """ Return the current CPU temperature, in degrees Celsius. """
         return self.temp_sensor.temperature()
 
     def cpu_usage(self):
@@ -59,15 +62,15 @@ class Monitor:
         return self.cpu_sensor.usage()
 
     def current(self):
-        """ Return the current"""
+        """ Return the current in mA. """
         return self.current_sensor.current()
 
     def power(self):
-        """ Return the power"""
+        """ Return the power in mW. """
         return self.current_sensor.power()
 
     def ram(self):
-        """ Return the RAM usage """
+        """ Return the RAM usage in bytes. """
         return self.ram_sensor.used()
 
     def _get_result(self, option):
