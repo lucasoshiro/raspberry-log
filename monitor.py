@@ -49,30 +49,30 @@ class NetSensor:
         self._net_io_counters = net_io_counters
 
         n0 = self._net_io_counters()
-        self._td0, self._tu0 = (time(),) * 2
+        t = time()
 
-        self._d0, self._u0 = n0.bytes_recv, n0.bytes_sent
+        self.last_sample = {
+            'down': (t, n0.bytes_recv),
+            'up': (t, n0.bytes_sent)
+        }
+
+    def calculate_rate(self, field, callback):
+        t1, s1 = time(), callback()
+        t0, s0 = self.last_sample[field]
+
+        rate = (s1 - s0) / (t1 - t0)
+
+        self.last_sample[field] = (t1, s1)
+
+        return rate
 
     def download_rate(self):
-        d1 = self._net_io_counters().bytes_recv
-        td1 = time()
-
-        rate = (d1 - self._d0) / (td1 - self._td0)
-
-        self._td0, self._d0 = td1, d1
-
-        return rate
+        return self.calculate_rate(
+            'down', lambda: self._net_io_counters().bytes_recv)
 
     def upload_rate(self):
-        u1 = self._net_io_counters().bytes_sent
-        tu1 = time()
-
-        rate = (u1 - self._u0) / (tu1 - self._tu0)
-
-        self._tu0, self._u0 = tu1, u1
-
-        return rate
-
+        return self.calculate_rate(
+            'up', lambda: self._net_io_counters().bytes_sent)
 
 class Monitor:
     def __init__(self, options):
