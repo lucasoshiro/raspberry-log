@@ -73,6 +73,7 @@ class NetSensor:
 
         return rate
 
+
 class Monitor:
     def __init__(self, options):
         possible = {'temp', 'usage', 'power', 'ram', 'net_down', 'net_up'}
