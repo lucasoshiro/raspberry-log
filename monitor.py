@@ -75,10 +75,12 @@ class NetSensor(RateSensor):
         }
 
     def download_rate(self):
+        """ Return the current download rate, in bytes per second."""
         return self.calculate_rate(
             'down', lambda: self._net_io_counters().bytes_recv)
 
     def upload_rate(self):
+        """ Return the current upload rate, in bytes per second."""
         return self.calculate_rate(
             'up', lambda: self._net_io_counters().bytes_sent)
 
