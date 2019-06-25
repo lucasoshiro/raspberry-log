@@ -60,16 +60,15 @@ class RateSensor:
 class NetSensor(RateSensor):
     def __init__(self):
         from psutil import net_io_counters
-        self._net_io_counters = net_io_counters
 
         super().__init__()
 
-        n0 = self._net_io_counters()
+        n0 = net_io_counters()
         t = time()
 
         self.last_sample = {
-            'down': (t, n0.bytes_recv, lambda: self._net_io_counters().bytes_recv),
-            'up':   (t, n0.bytes_sent, lambda: self._net_io_counters().bytes_sent)
+            'down': (t, n0.bytes_recv, lambda: net_io_counters().bytes_recv),
+            'up':   (t, n0.bytes_sent, lambda: net_io_counters().bytes_sent)
         }
 
     def download_rate(self):
@@ -80,15 +79,51 @@ class NetSensor(RateSensor):
         """ Return the current upload rate, in bytes per second."""
         return self.calculate_rate('up')
 
+class DiskSensor(RateSensor):
+    def __init__(self):
+        from psutil import disk_io_counters
+
+        super().__init__()
+
+        d = self._disk_io_counters()
+        t = time()
+
+        self.last_sample = {
+            'read_count':  (t, d.read_count,  lambda: disk_io_counters().read_count),
+            'write_count': (t, d.write_count, lambda: disk_io_counters().write_count),
+            'read_bytes':  (t, d.read_bytes,  lambda: disk_io_counters().read_bytes),
+            'write_bytes': (t, d.write_bytes, lambda: disk_io_counters().write_bytes),
+            'read_time':   (t, d.read_time,   lambda: disk_io_counters().read_time),
+            'write_time':  (t, d.write_time,  lambda: disk_io_counters().write_time)
+        }
+
+    def read_count_per_sec(self):
+        return self.calculate_rate('read_count')
+
+    def write_count_per_sec(self):
+        return self.calculate_rate('write_count')
+
+    def read_bytes_per_sec(self):
+        return self.calculate_rate('read_bytes')
+
+    def write_bytes_per_sec(self):
+        return self.calculate_rate('write_bytes')
+
+    def read_time_per_sec(self):
+        return self.calculate_rate('read_time')
+
+    def write_time_per_sec(self):
+        return self.calculate_rate('write_time')
+
 class Monitor:
     def __init__(self, options):
         possible = {'temp', 'usage', 'power', 'ram', 'net_down', 'net_up'}
         self.options = {*options}.intersection(possible) or possible
 
-        if 'temp'     in self.options: self.temp_sensor    = TempSensor()
-        if 'usage'    in self.options: self.cpu_sensor     = CPUSensor()
-        if 'power'    in self.options: self.current_sensor = CurrentSensor()
-        if 'ram'      in self.options: self.ram_sensor     = RAMSensor()
+        if 'temp'  in self.options: self.temp_sensor    = TempSensor()
+        if 'usage' in self.options: self.cpu_sensor     = CPUSensor()
+        if 'power' in self.options: self.current_sensor = CurrentSensor()
+        if 'ram'   in self.options: self.ram_sensor     = RAMSensor()
 
         if {'net_down', 'net_up'}.intersection(self.options):
             self.net_sensor = NetSensor()
