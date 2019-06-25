@@ -46,7 +46,7 @@ class RAMSensor:
 class RateSensor:
     def __init__(self):
         self.last_sample = {}
-    
+
     def calculate_rate(self, field):
         t0, s0, callback = self.last_sample[field]
         t1, s1 = time(), callback()
@@ -85,7 +85,7 @@ class DiskSensor(RateSensor):
 
         super().__init__()
 
-        d = self._disk_io_counters()
+        d = disk_io_counters()
         t = time()
 
         self.last_sample = {
@@ -117,7 +117,14 @@ class DiskSensor(RateSensor):
 
 class Monitor:
     def __init__(self, options):
-        possible = {'temp', 'usage', 'power', 'ram', 'net_down', 'net_up'}
+        possible = {
+            'temp', 'usage', 'power', 'ram',
+            'net_down', 'net_up',
+            'disk_rc', 'disk_wc',
+            'disk_rb', 'disk_wb',
+            'disk_rt', 'disk_wt'
+        }
+
         self.options = {*options}.intersection(possible) or possible
 
         if 'temp'  in self.options: self.temp_sensor    = TempSensor()
@@ -127,6 +134,11 @@ class Monitor:
 
         if {'net_down', 'net_up'}.intersection(self.options):
             self.net_sensor = NetSensor()
+
+        if {'disk_rc', 'disk_wc',
+            'disk_rb', 'disk_wb',
+            'disk_rt', 'disk_wt'}.intersection(self.options):
+            self.disk_sensor = DiskSensor()
 
     def cpu_temp(self):
         """ Return the current CPU temperature, in degrees Celsius. """
@@ -156,6 +168,24 @@ class Monitor:
         """ Return the upload rate in bytes per second. """
         return self.net_sensor.upload_rate()
 
+    def disk_rc(self):
+        return self.disk_sensor.read_count_per_sec()
+
+    def disk_wc(self):
+        return self.disk_sensor.write_count_per_sec()
+
+    def disk_rb(self):
+        return self.disk_sensor.read_bytes_per_sec()
+
+    def disk_wb(self):
+        return self.disk_sensor.write_bytes_per_sec()
+
+    def disk_rt(self):
+        return self.disk_sensor.read_time_per_sec()
+
+    def disk_wt(self):
+        return self.disk_sensor.write_time_per_sec()
+
     def _get_result(self, option):
         return {
             'temp':     self.cpu_temp,
@@ -163,7 +193,14 @@ class Monitor:
             'power':    self.power,
             'ram':      self.ram,
             'net_down': self.net_down,
-            'net_up':   self.net_up
+            'net_up':   self.net_up,
+
+            'disk_rc': self.disk_rc,
+            'disk_wc': self.disk_wc,
+            'disk_rb': self.disk_rb,
+            'disk_wb': self.disk_wb,
+            'disk_rt': self.disk_rt,
+            'disk_wt': self.disk_wt,
 
         }[option]()
 

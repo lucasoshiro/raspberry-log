@@ -10,10 +10,22 @@ opt_table = [
     ('c',  'cpu',      ('usage',),             'log CPU usage'),
     ('p',  'power',    ('power',),             'log Raspberry Pi power comsumption'),
     ('m',  'mem',      ('ram',),               'log RAM usage'),
+
     (None, 'net_down', ('net_down',),          'log download rate'),
     (None, 'net_up',   ('net_up',),            'log upload rate'),
     ('n',  None,       ('net_down', 'net_up'), 'log both download and upload rates'),
-]              
+
+    (None, 'disk_rc', ('disk_rc',), 'log number of reads from disk per second'),
+    (None, 'disk_wc', ('disk_wc',), 'log number of writes on disk per second'),
+    (None, 'disk_rb', ('disk_rb',), 'log number of bytes readen from disk per second'),
+    (None, 'disk_wb', ('disk_wb',), 'log number of bytes written on disk per second'),
+    (None, 'disk_rt', ('disk_rt',), 'log time spent reading from disk per second'),
+    (None, 'disk_wt', ('disk_wt',), 'log time spent writing on disk per second'),
+    ('d',  None,      ('disk_rc', 'disk_wc',
+                       'disk_rb', 'disk_wb',
+                       'disk_rt', 'disk_wt',),
+     'log all disk statistics')
+]
 
 def parse_args(args):
     flags = [*filter(lambda arg: arg[0] == '-', args)]
@@ -24,7 +36,6 @@ def parse_args(args):
     double = filter(lambda flag: len(flag) >= 3 and flag[1] == '-', flags)
     double = [x[2:] for x in double]
 
-    
     logfilename = args[-1] if args and args[-1][0] != '-' else None
 
     simple_opt = {flag: opt for flag, _, opt, __ in opt_table}
