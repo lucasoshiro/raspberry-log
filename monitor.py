@@ -43,19 +43,12 @@ class RAMSensor:
         """ Return the used virtual memory, in bytes. """
         return self._virtual_memory().used
 
-class NetSensor:
+class RateSensor:
     def __init__(self):
-        from psutil import net_io_counters
-        self._net_io_counters = net_io_counters
+        self.last_sample = {}
 
-        n0 = self._net_io_counters()
-        t = time()
-
-        self.last_sample = {
-            'down': (t, n0.bytes_recv),
-            'up': (t, n0.bytes_sent)
-        }
-
+        print("!")
+    
     def calculate_rate(self, field, callback):
         t1, s1 = time(), callback()
         t0, s0 = self.last_sample[field]
@@ -65,6 +58,21 @@ class NetSensor:
         self.last_sample[field] = (t1, s1)
 
         return rate
+
+class NetSensor(RateSensor):
+    def __init__(self):
+        from psutil import net_io_counters
+        self._net_io_counters = net_io_counters
+
+        super().__init__()
+
+        n0 = self._net_io_counters()
+        t = time()
+
+        self.last_sample = {
+            'down': (t, n0.bytes_recv),
+            'up': (t, n0.bytes_sent)
+        }
 
     def download_rate(self):
         return self.calculate_rate(
