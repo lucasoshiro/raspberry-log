@@ -46,16 +46,14 @@ class RAMSensor:
 class RateSensor:
     def __init__(self):
         self.last_sample = {}
-
-        print("!")
     
-    def calculate_rate(self, field, callback):
+    def calculate_rate(self, field):
+        t0, s0, callback = self.last_sample[field]
         t1, s1 = time(), callback()
-        t0, s0 = self.last_sample[field]
 
         rate = (s1 - s0) / (t1 - t0)
 
-        self.last_sample[field] = (t1, s1)
+        self.last_sample[field] = (t1, s1, callback)
 
         return rate
 
@@ -70,19 +68,17 @@ class NetSensor(RateSensor):
         t = time()
 
         self.last_sample = {
-            'down': (t, n0.bytes_recv),
-            'up': (t, n0.bytes_sent)
+            'down': (t, n0.bytes_recv, lambda: self._net_io_counters().bytes_recv),
+            'up':   (t, n0.bytes_sent, lambda: self._net_io_counters().bytes_sent)
         }
 
     def download_rate(self):
         """ Return the current download rate, in bytes per second."""
-        return self.calculate_rate(
-            'down', lambda: self._net_io_counters().bytes_recv)
+        return self.calculate_rate('down')
 
     def upload_rate(self):
         """ Return the current upload rate, in bytes per second."""
-        return self.calculate_rate(
-            'up', lambda: self._net_io_counters().bytes_sent)
+        return self.calculate_rate('up')
 
 class Monitor:
     def __init__(self, options):
